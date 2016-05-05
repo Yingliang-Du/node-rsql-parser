@@ -1,2 +1,2 @@
 # node-rsql-parser
-A RESTful Service Query Language (RSQL) in NodeJS
+A RESTful Service Query Language (RSQL) Parser in NodeJS
