@@ -12,3 +12,11 @@ The following is a list of comparison operators:
 |=le= or <=|Less Or Equal To|
 |=gt= or >|Greater Than|
 |=ge= or >=|Greater Or Equal To|
+|=in=|In|
+|=out=|Not In|
+The following is the list of two composite operators:
+
+|Composite Operator|Description|
+|-------|-------|
+|;|AND|
+|,|OR|
