@@ -15,7 +15,4 @@ The following is a list of comparison operators:
 |=in=|In|
 |=out=|Not In|
 The following is the list of two composite operators:
-|Composite Operator|Description|
-|-------|-------|
-|;|AND|
-|,|OR|
+
