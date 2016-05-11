@@ -3,7 +3,9 @@
 
 ## RSQL Overview
 RSQL defines comparison operators and composite operators base on FIQL. Those operators can be used to build complex queries.
+
 The following is a list of comparison operators:
+
 |Comparison Operator|Description|
 |-------|-------|
 |==|Equal To |
@@ -14,6 +16,7 @@ The following is a list of comparison operators:
 |=ge= or >=|Greater Or Equal To|
 |=in=|In|
 |=out=|Not In|
+
 The following is the list of two composite operators:
 
 |Composite Operator|Description|
