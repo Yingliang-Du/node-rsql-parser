@@ -1,2 +1,2 @@
-# node-rsql-parser
-A RESTful Service Query Language (RSQL) Parser in NodeJS
+# Node RSQL / FIQL Parser
+RSQL (RESTful Service Query Language) is an extention of FIQL (Feed Item Query Language)
