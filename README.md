@@ -30,3 +30,7 @@ The following is the list of two composite operators:
 |,|OR|
 
 By default, the AND operator takes precedence (meaning, it’s evaluated before any OR operators are). However, a parenthesized expression can be used to change the precedence, yielding whatever the contained expression yields.
+
+## License
+
+This project is licensed under [MIT license](http://opensource.org/licenses/MIT).
