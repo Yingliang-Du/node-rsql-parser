@@ -31,26 +31,25 @@ RSQL strings been tested:
 -(and/or) rsql string include ('=in=', '=out=')
   claimSubmisionDate=lt=2015-07-01;claimSubmisionDate=gt=2015-01-01;account.product.lineOfBusinessCode=in=(AH,LI,RWM);insured.name.suffix==Ms;claimStatusCode=in=(SUBMITTED,PENDING,ACTIVE),claimNumber== "155831094578314641816"
   paymentStatusCode=in=('PAID', 'INPROGRESS', 'DECLINED');datePaid>='2010-01-01';datePaid<='2016-01-01';productType=in=('AUTO', 'LIFE');formType=in=('Statement', 'Contract')
+  submisionDate=lt=2015-07-01;submisionDate=gt=2015-01-01;account.product.code=in=(AH,LI,RWM);insured.name.suffix==Ms;statusCode=in=(SUBMITTED,PENDING,ACTIVE),key=out=( "15583109","4578314641816");mustHave=='Key Things'
 -rsql string contains key without value--should be ignored
 	productType=in=('AUTO');documentType=in=('Statement');date>=;date<='2016-01-01';
   productType=in=('AUTO');documentType=in=('Statement');date;date<='2016-01-01';
   productType=in=;documentType=in=('Statement');date>='2010-01-01';date<='2016-01-01';
 -rsql contains parenthesized sections
   (something=='Some Thing',somedate=ge=2000-01-01),claimSubmisionDate=lt=2015-07-01;claimSubmisionDate=gt=2015-01-01;account.product.lineOfBusinessCode=in=(AH,LI,RWM);insured.name.suffix==Ms;claimStatusCode=in=(SUBMITTED,PENDING,ACTIVE),claimNumber== "155831094578314641816"
-	((insuredDetails.name.firstName=='JOHN';insuredDetails.name.lastName=='DOE'))
-  ((insuredDetails.name.firstName=='JOHN';insuredDetails.name.lastName=='DOE'),(insuredDetails.name.firstName=='JANE';insuredDetails.name.lastName=='DOE'))
+	((insured.name.firstName=='JOHN';insured.name.lastName=='DOE'))
+  ((insured.name.firstName=='JOHN';insured.name.lastName=='DOE'),(insured.name.firstName=='JANE';insured.name.lastName=='DOE'))
 */
 var rsqlParser = exports;
 
+var objUtil = require('./obj-util');
 var logger = require('./logger');
 
 /**
  *  parsing rsql string - break it into operation units
  */
 rsqlParser.parsing = function(rsqlString) {
-  // array of sections which contains operation units
-  var rsqlUnits = {};
-
   logger.debug('original rsqlString -', rsqlString);
   // if the rsql string is parenthesized, remove the outer parentheses
   var parenthesized = true;
@@ -74,9 +73,9 @@ rsqlParser.parsing = function(rsqlString) {
    *  parse rsql and deal with parenthesized() sections;
    *  break rsql string into operation units.
    */
-  rsqlUnits = tokenizeRsqlSection(rsqlString);
+  var rsqlUnits = tokenizeRsqlSection(rsqlString);
 
-  logger.debug('break rsql string into operation units:', rsqlUnits);
+  logger.debug('Broke rsql string into operation units:', rsqlUnits);
   return rsqlUnits;
 }
 
@@ -86,7 +85,6 @@ rsqlParser.parsing = function(rsqlString) {
  */
 function tokenizeRsqlSection(sectionString) {
   var sectionUnit = {};
-  var tokenSections;
 
   // check and, or build arrays
   var tokenOrs, tokenAnds;
@@ -95,17 +93,13 @@ function tokenizeRsqlSection(sectionString) {
   if (sectionString.includes(',')) {
     // build _or array in section unit
     var _or = [];
-    sectionUnit.or = _or; 
     // tokenize into _or elements
     tokenOrs = sectionString.split(",");
     for (var i = 0; i < tokenOrs.length; i++) {
       // check for token contains _and elements
       if (tokenOrs[i].includes(';')) {
-        // build and unit in _or array
-        var andUnit = {};
+        // init _and array
         _and = [];
-        andUnit.and = _and;
-        _or.push(andUnit);
         // tokenize to _and elements
         tokenAnds = tokenOrs[i].split(';');
         // build and array
@@ -116,34 +110,75 @@ function tokenizeRsqlSection(sectionString) {
               continue tokenize section recursively.
               a section should be parenthesized.
           */
-          analyzeNAddSection(tokenAnds[j], _and);
+          if (objUtil.isEmpty(tokenAnds[j])) {
+            logger.debug('Ignoring the empty and token...');
+          }
+          else {
+            analyzeNAddSection(tokenAnds[j], _and);
+          }
+        }
+        logger.debug('Add the and unit in or array only if _and array is not empty!');
+        if (!objUtil.isEmpty(_and)) {
+          // build and unit in _or array
+          var andUnit = {};
+          andUnit.and = _and;
+          _or.push(andUnit);
         }
       }
       else {
         // add to _or array base on token type
-        analyzeNAddSection(tokenOrs[i], _or);
+        if (objUtil.isEmpty(tokenOrs[i])) {
+          logger.debug('Ignoring the empty or token...');
+        }
+        else {
+          analyzeNAddSection(tokenOrs[i], _or);
+        }
       }
+    }
+    // Add _or array to sectionUnit only if it is not empty!
+    if (objUtil.isEmpty(_or)) {
+      logger.debug('Add _or array to sectionUnit only if it is not empty!');
+    }
+    else if (_or.length === 1) {
+      // if _or array only contains one element - assign the element to sectionUnit
+      sectionUnit = _or[0];
+    }
+    else {
+      // assign _or to sectionUnit.or when _or array contains multiple elements
+      sectionUnit.or = _or; 
     }
   }
   else if (sectionString.includes(';')) {
     // build _and array in section unit - only contains ands
     _and = [];
-    sectionUnit.and = _and;
     // tokenize into and elements
     tokenAnds = sectionString.split(';');
     for (var i = 0; i < tokenAnds.length; i++) {
       //_and.push(tokenAnds[i]);
-      /* if the element is a section(not operation unit) 
+      /*  - if the element is a section(not operation unit) 
           continue tokenize section recursively.
           a section should be parenthesized.
+          - the empty token will be ignored
       */
-      analyzeNAddSection(tokenAnds[i], _and);
+      if (objUtil.isEmpty(tokenAnds[j])) {
+        logger.debug('Ignoring the empty and token...');
+      }
+      else {
+        analyzeNAddSection(tokenAnds[i], _and);
+      }
+    }
+    logger.debug('Add _and array to sectionUnit only if it is not empty!');
+    if (!objUtil.isEmpty(_and)) {
+      sectionUnit.and = _and; 
     }
   }
   else {
     // single element - should be operation unit itself
-    sectionUnit = sectionString;
     logger.debug('single element(should be operation unit itself) -', sectionUnit);
+    // assign to sectionUnit only if it is not empty
+    if (!objUtil.isEmpty(sectionString)) {
+      sectionUnit = sectionString; 
+    }
   }
 
   return sectionUnit;
@@ -156,10 +191,19 @@ function tokenizeRsqlSection(sectionString) {
  *    recursivly tokenize the section if it is not an operation unit 
  */
 function analyzeNAddSection(token, _and_or) {
+  logger.debug('Into rsqlParser.analyzeNAddSection() token', token);
+  // do not add empty token
+  /*
+  if (objUtil.isEmpty(token)) {
+    return;
+  }
+  */
+  // continue deal with non empty token
   var tokenSections = [];
   peerParenthesizedSections(token, tokenSections);
+  logger.debug('for this token - peer parenthesized sections', tokenSections);
   if (tokenSections.length === 0) {
-    // add the operation unit into _or array
+    // the token itself is not parenthesized, add it to _and_or array
     _and_or.push(token);
   }
   else if (tokenSections.length === 1) {
@@ -172,7 +216,7 @@ function analyzeNAddSection(token, _and_or) {
         continue tokenize section recursively.
         this token should be parenthesized.
     */
-    // replace '*' with ';' and '#' with ','
+    // un-mask replace '*' with ';' and '#' with ','
     tokenSections[0] = tokenSections[0].replace(/\*/g, ';');
     tokenSections[0] = tokenSections[0].replace(/\#/g, ',');
     // mask parenthesized section
@@ -262,7 +306,7 @@ function peerParenthesizedSections(text, sections) {
     sections.push(text.substring(i+2, end));
   }
   
-  // recurersivelly find the next section
+  // recurersivelly find the next section - for maskParenthesizedSections
   peerParenthesizedSections(text.substring(0, i), sections);
 }
 
@@ -303,7 +347,10 @@ rsqlParser.tokenizeOperator = function(unitString, operator) {
   }
   else {
     // trim and remove quotes from value for all operation values except array
-    element.value = token[1].trim().replace(/["']/g, "");
+    // except value that undefined or null 
+    if (token[1]) {
+      element.value = token[1].trim().replace(/["']/g, "");
+    }
   }
 
   return element;

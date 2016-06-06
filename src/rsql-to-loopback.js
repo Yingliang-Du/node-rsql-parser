@@ -2,6 +2,7 @@
  *	Convert RSQL query string to loopback search criteria.
  */
 var rsqlParser = require('./rsql-parser');
+var objUtil = require('./obj-util');
 var logger = require('./logger');
 
 module.exports = function(rsqlString) {
@@ -9,8 +10,6 @@ module.exports = function(rsqlString) {
  	var _where = {};  	 	
 
   	var rsqlUnits = rsqlParser.parsing(rsqlString);
-  	logger.debug('rsql units -', rsqlUnits);
-  	logger.debug('typeof rsql units -', typeof rsqlUnits);
 
   	if (rsqlUnits.or) {
   		// Build loopback query where.or array
@@ -39,13 +38,13 @@ module.exports = function(rsqlString) {
 }
 
 function parseRsqlUnits(operationUnits, _or_and) {
-	logger.debug('operation units -', operationUnits);
+	logger.debug('rsql2loopback.parseRsqlUnits() operation units -', operationUnits);
 	var _element;
 	for(var i=0; i<operationUnits.length; i++) {
 		logger.debug('typeof unit i-' + i, typeof operationUnits[i]);
 		if (typeof operationUnits[i] === 'object') {
 			var section = {};
-			// ths unit contains array of units
+			// this unit contains array of units
 			if (operationUnits[i].or) {
 				var _or = [];
 				section.or = _or;
@@ -67,7 +66,11 @@ function parseRsqlUnits(operationUnits, _or_and) {
 		else {
 			// this unit is an operation unit
 			_element = parseOperationUnit(operationUnits[i]);
-  			_or_and.push(_element);
+			_or_and.push(_element);
+			// the empty element will be ignored
+			// if (!objUtil.isEmpty(_element)) {
+  	// 			_or_and.push(_element);
+  	// 		}
 		}
 	}
 }
@@ -82,13 +85,15 @@ function parseOperationUnit(unitString) {
 	var operator = rsqlParser.getOperator(unitString);
 	var operatorMap = buildOperatorMap();
 
+	if (!operator) {
+		return element;
+	}
+
 	if (operator === '==') {
 		unitMap = rsqlParser.tokenizeOperator(unitString, operator);
 		// Build array elements for _and or _or
-      	if (unitMap.value === '') {
-      		// unit operation that contains key but no value will be ignored
-      	}
-      	else {
+		// unit operation that contains key but no value will be ignored
+      	if (unitMap.value) {
       		// '==' --> key: value
       		element[unitMap.key] = unitMap.value;
       	}
@@ -97,10 +102,8 @@ function parseOperationUnit(unitString) {
 		// operators need common operation logic
     	unitMap = rsqlParser.tokenizeOperator(unitString, operator);
 		// Build array elements for _and or _or
-      	if (unitMap.value === '') {
-      		// unit operation that contains key but no value will be ignored
-      	}
-      	else {
+		// unit operation that contains key but no value will be ignored
+      	if (unitMap.value) {
       		// build only when contains both key and value
       		var operation = {}
       		operation[operatorMap.get(operator)] = unitMap.value;
@@ -108,6 +111,7 @@ function parseOperationUnit(unitString) {
       	}
     }
 
+    logger.debug('operator - ' + operator + ' unitMap -', unitMap);
     logger.debug('element for operation unit -', element);
     return element;
 }

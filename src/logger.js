@@ -35,10 +35,10 @@ logger.error = function(message, object) {
 function log(message, object) {
   // build message string - suppose JSON if not String
   if (!object) {
-    // just print message without object
+    // when object is null or undefined - just print message
   }
   else if (typeof object !== 'string') {
-    message += ' => ' + JSON.stringify(object);
+    message += ' => ' + JSON.stringify(object, null, 4);
   }
   else {
     message += ' => ' + object;
