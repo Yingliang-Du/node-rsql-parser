@@ -1,7 +1,6 @@
 # Node RSQL / FIQL Parser
 ## Gratitute
-Without GOD's blessing, I am not able to do anything useful!
-
+Without GOD's blessing, I am not able to do anything useful!  
 Thanks to Prashanth Ponugoti and Kameswara Eati for their guidance, inspiration and contribution.
 
 ## Overview
