@@ -1,6 +1,10 @@
 # Node RSQL / FIQL Parser
 [RSQL](https://github.com/jirutka/rsql-parser) (RESTful Service Query Language) is an extention of [FIQL](http://tools.ietf.org/html/draft-nottingham-atompub-fiql-00) (Feed Item Query Language). It is very simple and yet capable to express complex queries within a HTTP URI string. It is very well adopted as a generic query language for searching RESTful service endpoints.
 
+## Gratitute
+Without GOD's blessing, I am not able to do anything useful!
+Thanks to Prashanth Ponugoti and Kameswara Eati for their guidance, inspiration and contribution.
+
 ## RSQL Overview
 RSQL defines comparison operators and composite operators base on FIQL. Those operators can be used to build complex queries.
 
