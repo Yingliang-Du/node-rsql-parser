@@ -2,7 +2,6 @@
  *	Convert RSQL query string to loopback search criteria.
  */
 var rsqlParser = require('./rsql-parser');
-var objUtil = require('./obj-util');
 var logger = require('./logger');
 
 module.exports = function(rsqlString) {
@@ -67,10 +66,6 @@ function parseRsqlUnits(operationUnits, _or_and) {
 			// this unit is an operation unit
 			_element = parseOperationUnit(operationUnits[i]);
 			_or_and.push(_element);
-			// the empty element will be ignored
-			// if (!objUtil.isEmpty(_element)) {
-  	// 			_or_and.push(_element);
-  	// 		}
 		}
 	}
 }

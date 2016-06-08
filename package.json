@@ -1,15 +1,23 @@
 {
   "name": "node-rsql-parser",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "NodeJS RSQL / FIQL Parser",
   "main": "app.js",
   "scripts": {
     "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["RSQL", "FIQL", "parser"],
+  "bugs": { 
+    "url" : "https://github.com/Yingliang-Du/node-rsql-parser/issues",
+    "email" : "yingliang_d@yahoo.com"
+  },
+  "author": "Yingliang Du",
+  "license": "MIT",
+  "repository" : { 
+    "type" : "git", 
+    "url" : "https://github.com/Yingliang-Du/node-rsql-parser.git"
+  },
   "dependencies": {
     "express": "^4.13.4"
   }
