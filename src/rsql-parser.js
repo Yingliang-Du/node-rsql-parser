@@ -40,6 +40,7 @@ RSQL strings been tested:
   (something=='Some Thing',somedate=ge=2000-01-01),claimSubmisionDate=lt=2015-07-01;claimSubmisionDate=gt=2015-01-01;account.product.lineOfBusinessCode=in=(AH,LI,RWM);insured.name.suffix==Ms;claimStatusCode=in=(SUBMITTED,PENDING,ACTIVE),claimNumber== "155831094578314641816"
 	((insured.name.firstName=='JOHN';insured.name.lastName=='DOE'))
   ((insured.name.firstName=='JOHN';insured.name.lastName=='DOE'),(insured.name.firstName=='JANE';insured.name.lastName=='DOE'))
+  ((firstName==john;lastName==doe),(firstName==aaron;lastName==carter));((age==21;height==90),(age==30;height==100))
 */
 var rsqlParser = exports;
 
@@ -160,7 +161,7 @@ function tokenizeRsqlSection(sectionString) {
           a section should be parenthesized.
           - the empty token will be ignored
       */
-      if (objUtil.isEmpty(tokenAnds[j])) {
+      if (objUtil.isEmpty(tokenAnds[i])) {
         logger.debug('Ignoring the empty and token...');
       }
       else {
