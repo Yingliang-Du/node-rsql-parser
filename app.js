@@ -1,6 +1,5 @@
 var express = require('express');
 var rsqlParser = require('./src/rsql-parser');
-var rsql2Loopback = require('./src/rsql-to-loopback');
 var logger = require('./src/logger');
 
 var app = express();
@@ -23,7 +22,7 @@ router.get("/", function(req,res){
 });
 
 // endpoint for testing rsql parsing
-// url: http://localhost:3002/rsql?q=objname=='ObjectName'
+// url: http://localhost:3001/rsql?q=objname=='ObjectName'
 router.get('/rsql', function(req, res) {
 
    // print out the request
@@ -31,8 +30,7 @@ router.get('/rsql', function(req, res) {
    console.log(req.query);
    var rsqlString = req.query.q;
 
-//   res.send(JSON.stringify(rsqlParser.parsing(rsqlString), null, 4));
-   res.send(JSON.stringify(rsql2Loopback(rsqlString), null, 4));
+   res.send(JSON.stringify(rsqlParser.parsing(rsqlString), null, 4));
    res.end();
 });
 
@@ -49,6 +47,6 @@ app.use("*", function(req, res){
 });
 
 // Start the server on specified port
-app.listen(3002, function() {
-  console.log("Live at Port 3002");
+app.listen(3001, function() {
+  console.log("Live at Port 3001");
 });

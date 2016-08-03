@@ -10,13 +10,11 @@ objUtil.isEmpty = function(obj) {
 	if (!obj) {
 		return true;
 	}
-
+	
 	// when obj is empty
 	if (Object.keys(obj).length === 0) {
 		return true;
 	}
-
-	// rsqlUnits.or.length
 
 	logger.debug('obj is not empty!');
 	return false;
