@@ -328,12 +328,12 @@ rsqlParser.tokenizeOperator = function(unitString, operator) {
   if (['=in=', '=out='].indexOf(operator) !== -1) {
     // Build array elements for =in= or =out=
     var ary = [];
-    if (token[1].startsWith('(')) {
+    if (token[1].trim().startsWith('(')) {
       // remove parens to get elements
-      var value = token[1].substring(1, token[1].length-1);
+      var value = token[1].trim().substring(1, token[1].length-1);
       logger.debug("The array value -->" + value);
       // extract element in the array
-      var arrayTokens = value.split('#');
+      var arrayTokens = value.split(',');
       for (var k=0; k<arrayTokens.length; k++) {
         // trim and remove quotes from each element of array
         ary.push(arrayTokens[k].trim().replace(/["']/g, ""));
